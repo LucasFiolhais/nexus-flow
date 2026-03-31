@@ -1,13 +1,13 @@
 import withNuxt from './.nuxt/eslint.config.mjs'
 import prettierConfig from 'eslint-config-prettier'
 
-export default withNuxt([
+export default withNuxt(
   {
     rules: {
       'vue/multi-word-component-names': 'off',
-      'no-console': 'warn'
+      'no-console': 'warn',
+      '@typescript-eslint/consistent-type-imports': 'error'
     }
   },
-
   prettierConfig
-])
+)
