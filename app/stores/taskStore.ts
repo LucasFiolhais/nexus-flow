@@ -18,7 +18,7 @@ export const useTaskStore = defineStore('taskStore', {
       }
     ] as Column[]
   }),
-  //para mudar os dados
+  //mudar os dados
   actions: {
     addTask(columnTitle: string, newTask: Task) {
       const column = this.columns.find((column) => column.title === columnTitle)
@@ -33,6 +33,6 @@ export const useTaskStore = defineStore('taskStore', {
       })
     }
   },
-  //manter os dados mesmo após o refresh da página
-  persist: true //é preicso o plugin 'pinia-plugin-persistedstate'
+  // para manter os dados
+  persist: true
 })
