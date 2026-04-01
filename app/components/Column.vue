@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import draggable from 'vuedraggable'
 import { type Column } from '~/types/kanban'
 
 defineProps<{
@@ -13,9 +14,19 @@ defineProps<{
       <span class="badge">{{ column.tasks.length }}</span>
     </div>
 
-    <div class="list">
-      <Card v-for="task in column.tasks" :key="task.id" :task="task" />
-    </div>
+    <draggable
+      v-model="column.tasks"
+      group="tasks"
+      item-key="id"
+      class="task-list"
+      ghost-class="ghost-card"
+      drag-class="drag-card"
+      :animation="200"
+    >
+      <template #item="{ element }">
+        <Card :task="element" />
+      </template>
+    </draggable>
   </section>
 </template>
 
@@ -41,22 +52,32 @@ defineProps<{
   font-size: 14px;
   font-weight: 600;
   color: #94a3b8;
-  margin: 0;
 }
 
-.badge {
-  font-size: 12px;
-  background-color: #1e293b;
-  padding: 2px 8px;
-  border-radius: 4px;
-  color: #64748b;
-}
-
-.list {
+.task-list {
   padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  overflow-y: auto;
+  min-height: 150px; /* Importante para conseguir soltar tarefas numa coluna vazia */
+}
+
+/* Estilo do 'fantasma' (onde o card vai cair) */
+.ghost-card {
+  opacity: 0.5;
+  background: #3b82f6 !important;
+  border: 2px dashed #60a5fa !important;
+}
+
+.drag-card {
+  transform: rotate(3deg);
+}
+
+.badge {
+  font-size: 11px;
+  background-color: #1e293b;
+  padding: 2px 8px;
+  border-radius: 4px;
+  color: #64748b;
 }
 </style>
