@@ -4,6 +4,8 @@ import { type Task } from '~/types/kanban'
 defineProps<{
   task: Task
 }>()
+
+const { formatDate } = useFormatter()
 </script>
 
 <template>
@@ -12,15 +14,27 @@ defineProps<{
     <p class="card-description">{{ task.description }}</p>
 
     <footer class="card-footer">
-      <span :class="['priority-badge', task.priority]">
-        {{ task.priority }}
-      </span>
+      <div class="meta">
+        <span class="date">{{ formatDate(task.CreatedAt) }}</span>
+        <span :class="['priority-badge', task.priority]">{{ task.priority }}</span>
+      </div>
       <span class="card-id">#{{ task.id }}</span>
     </footer>
   </div>
 </template>
 
 <style scoped>
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.date {
+  font-size: 11px;
+  color: #64748b;
+}
+
 .card {
   background-color: #1e293b;
   padding: 16px;
