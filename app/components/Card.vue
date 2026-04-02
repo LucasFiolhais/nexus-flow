@@ -6,10 +6,17 @@ const props = defineProps<{ task: Task }>()
 const { formatDate } = useFormatter()
 
 const deleteTask = () => {
-  if (confirm('Eliminar esta tarefa?')) {
-    taskStore.removeTask(props.task.id)
-  }
+  taskStore.removeTask(props.task.id)
 }
+
+const changeColumn = (event: Event) => {
+  const select = event.target as HTMLSelectElement
+  taskStore.moveTask(props.task.id, select.value)
+}
+
+const currentColumn = computed(() => {
+  return taskStore.columns.find((col) => col.tasks.some((t) => t.id === props.task.id))?.title
+})
 </script>
 
 <template>
@@ -27,6 +34,11 @@ const deleteTask = () => {
         </span>
       </div>
       <span class="id">#{{ task.id }}</span>
+      <select :value="currentColumn" @change="changeColumn" class="select-status">
+        <option value="To Do">To Do</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Done">Done</option>
+      </select>
     </footer>
   </div>
 </template>
@@ -107,6 +119,25 @@ const deleteTask = () => {
 .id {
   font-size: 9px;
   color: #475569;
+}
+.select-status {
+  background: #0f172a;
+  border: 1px solid #334155;
+  color: #64748b;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 6px;
+  cursor: pointer;
+  outline: none;
+  width: fit-content;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.select-status:hover {
+  border-color: #3b82f6;
+  color: #f8fafc;
 }
 
 .badge {
