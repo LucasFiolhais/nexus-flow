@@ -5,7 +5,7 @@ export interface Task {
   title: string
   description: string
   priority: 'low' | 'medium' | 'high'
-  CreatedAt: Date
+  createdAt: Date
 }
 export interface Column {
   title: string

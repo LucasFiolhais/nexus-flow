@@ -1,29 +1,66 @@
 <script setup lang="ts">
-import { type Task } from '~/types/kanban'
+import type { Task } from '~/types/kanban'
 
-defineProps<{
-  task: Task
-}>()
-
+defineProps<{ task: Task }>()
 const { formatDate } = useFormatter()
+
+const priorityColors = { low: '#10b981', medium: '#f59e0b', high: '#ef4444' }
 </script>
 
 <template>
   <div class="card">
-    <h3 class="card-title">{{ task.title }}</h3>
-    <p class="card-description">{{ task.description }}</p>
+    <h3 class="title">{{ task.title }}</h3>
+    <p class="desc">{{ task.description }}</p>
 
-    <footer class="card-footer">
+    <footer class="footer">
       <div class="meta">
-        <span class="date">{{ formatDate(task.CreatedAt) }}</span>
-        <span :class="['priority-badge', task.priority]">{{ task.priority }}</span>
+        <span class="date">{{ formatDate(task.createdAt) }}</span>
+        <span class="badge" :style="{ backgroundColor: priorityColors[task.priority] }">
+          {{ task.priority }}
+        </span>
       </div>
-      <span class="card-id">#{{ task.id }}</span>
+      <span class="id">#{{ task.id }}</span>
     </footer>
   </div>
 </template>
 
 <style scoped>
+.card {
+  background: #1e293b;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: grab;
+  transition: 0.2s;
+}
+
+.card:hover {
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0;
+}
+.desc {
+  font-size: 13px;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 8px;
+}
+
 .meta {
   display: flex;
   flex-direction: column;
@@ -35,74 +72,18 @@ const { formatDate } = useFormatter()
   color: #64748b;
 }
 
-.card {
-  background-color: #1e293b;
-  padding: 16px;
-  border-radius: 8px;
-  border: 1px solid #334155;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  transition: all 200ms ease-in-out;
-  cursor: grab;
-}
-
-.card:hover {
-  border-color: #3b82f6;
-  background-color: #263349;
-  transform: translateY(-2px);
-}
-
-.card:active {
-  cursor: grabbing;
-}
-
-.card-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: #f8fafc;
-  margin: 0;
-}
-
-.card-description {
-  font-size: 13px;
-  color: #94a3b8;
-  line-height: 18px;
-  margin: 0;
-}
-
-.card-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 8px;
-}
-
-.priority-badge {
-  font-size: 11px;
+.badge {
+  font-size: 10px;
   padding: 2px 8px;
   border-radius: 4px;
   text-transform: uppercase;
   font-weight: 800;
-  letter-spacing: 0.5px;
+  color: white;
+  width: fit-content;
 }
 
-.low {
-  background-color: #10b981;
-  color: #ffffff;
-}
-.medium {
-  background-color: #f59e0b;
-  color: #ffffff;
-}
-.high {
-  background-color: #ef4444;
-  color: #ffffff;
-}
-
-.card-id {
+.id {
   font-size: 10px;
   color: #475569;
-  font-weight: 600;
 }
 </style>
