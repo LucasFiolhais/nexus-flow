@@ -7,10 +7,13 @@ const props = defineProps<{
   column: Column
 }>()
 
+const newTaskPriority = ref<'low' | 'medium' | 'high'>('medium')
+
 const taskStore = useTaskStore()
 
 const newTaskTitle = ref('')
 const newTaskDescription = ref('')
+newTaskPriority.value = 'medium'
 const isAdding = ref(false)
 
 const addTask = () => {
@@ -20,7 +23,7 @@ const addTask = () => {
     id: Date.now(),
     title: newTaskTitle.value,
     description: newTaskDescription.value.trim() || 'Sem descrição',
-    priority: 'medium',
+    priority: newTaskPriority.value,
     createdAt: new Date().toISOString() as any
   }
 
@@ -54,7 +57,7 @@ const addTask = () => {
 
       <template #footer>
         <div v-if="column.tasks.length === 0 && !isAdding" class="empty-state">
-          Arraste algo para aqui ou crie uma tarefa.
+          Arrasta algo para aqui ou cria uma tarefa.
         </div>
       </template>
     </draggable>
@@ -75,6 +78,12 @@ const addTask = () => {
           class="task-textarea"
           rows="2"
         ></textarea>
+
+        <select v-model="newTaskPriority" class="input select-priority">
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
 
         <div class="form-buttons">
           <button class="btn-confirm" @click="addTask">Adicionar</button>
@@ -217,5 +226,27 @@ const addTask = () => {
   opacity: 0.5;
   background: #3b82f6;
   border-radius: 8px;
+}
+
+.select-priority {
+  width: 100%;
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  padding: 8px;
+  color: #94a3b8;
+  font-size: 13px;
+  margin-bottom: 8px;
+  outline: none;
+  cursor: pointer;
+}
+
+.select-priority:focus {
+  border-color: #3b82f6;
+}
+
+.select-priority option {
+  background-color: #0f172a;
+  color: white;
 }
 </style>
