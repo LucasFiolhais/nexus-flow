@@ -16,7 +16,7 @@ const taskStore = useTaskStore()
   gap: 20px;
   padding: 20px;
   width: 100%;
-  height: 800px;
+  min-height: 800px;
   align-items: flex-start;
 }
 </style>
