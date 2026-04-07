@@ -10,11 +10,9 @@ const props = defineProps<{
 
 const taskStore = useTaskStore()
 
-// LÓGICA CRÍTICA: Computed Setter para sincronizar o drag com a Store original
 const tasks = computed({
   get: () => props.column.tasks,
   set: (newList) => {
-    // Encontra a coluna real no state da store e atualiza o seu array de tarefas
     const targetCol = taskStore.columns.find((c) => c.title === props.column.title)
     if (targetCol) {
       targetCol.tasks = newList
@@ -28,7 +26,6 @@ const newTaskDescription = ref('')
 const newTaskPriority = ref<'low' | 'medium' | 'high'>('medium')
 const isAdding = ref(false)
 
-// Bloqueia o drag se houver filtros ativos para evitar corrupção de dados
 const isDraggable = computed(() => {
   return taskStore.searchQuery === '' && taskStore.filterPriority === 'all'
 })
