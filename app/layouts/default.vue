@@ -4,10 +4,12 @@
   <div class="layout">
     <nav class="navbar">
       <div class="nav-content">
-        <div class="brand-wrapper">
-          <img src="/logo.png" alt="Nexus Flow" class="logo" />
-          <h1 class="brand">Nexus <span class="brand-accent">Flow</span></h1>
-        </div>
+        <NuxtLink to="/" class="brand-link">
+          <div class="brand-wrapper">
+            <img src="/logo.png" alt="Nexus Flow" class="logo" />
+            <h1 class="brand">Nexus <span class="brand-accent">Flow</span></h1>
+          </div>
+        </NuxtLink>
       </div>
       <div class="nav-bottom-line"></div>
     </nav>
@@ -49,6 +51,16 @@
   width: 100%;
 }
 
+.brand-link {
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.2s ease;
+}
+
+.brand-link:hover {
+  opacity: 0.85;
+}
+
 .brand-wrapper {
   display: flex;
   flex-direction: column;
@@ -69,8 +81,8 @@
   transition: transform 0.3s ease;
 }
 
-.logo:hover {
-  transform: scale(1.05);
+.brand-link:hover .logo {
+  transform: scale(1.03);
 }
 
 .brand {
@@ -85,9 +97,9 @@
 
 .brand-accent {
   background: linear-gradient(90deg, #60a5fa 0%, #2563eb 100%);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-clip: text;
   filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.3));
 }
 
