@@ -74,7 +74,6 @@
 }
 
 .brand {
-  /* Tamanho da fonte ajusta-se entre 28px e 42px conforme a largura da janela */
   font-size: clamp(28px, 5vw, 42px);
   font-weight: 900;
   letter-spacing: -2px;
