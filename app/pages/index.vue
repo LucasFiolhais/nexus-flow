@@ -5,18 +5,29 @@ const taskStore = useTaskStore()
 </script>
 
 <template>
-  <div class="board">
-    <Column v-for="column in taskStore.columns" :key="column.title" :column="column" />
+  <div class="page-wrapper">
+    <BoardFilters />
+
+    <div class="board">
+      <Column v-for="column in taskStore.filteredColumns" :key="column.title" :column="column" />
+    </div>
   </div>
 </template>
 
 <style scoped>
+.page-wrapper {
+  padding: 24px;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .board {
   display: flex;
   gap: 20px;
-  padding: 20px;
   width: 100%;
-  min-height: 800px;
   align-items: flex-start;
 }
 </style>

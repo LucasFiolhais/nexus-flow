@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import draggable from 'vuedraggable'
+import { ref, computed } from 'vue'
 import type { Task, Column } from '~/types/kanban'
 import { useTaskStore } from '~/stores/taskStore'
 
@@ -7,14 +8,30 @@ const props = defineProps<{
   column: Column
 }>()
 
-const newTaskPriority = ref<'low' | 'medium' | 'high'>('medium')
-
 const taskStore = useTaskStore()
 
+// LÓGICA CRÍTICA: Computed Setter para sincronizar o drag com a Store original
+const tasks = computed({
+  get: () => props.column.tasks,
+  set: (newList) => {
+    // Encontra a coluna real no state da store e atualiza o seu array de tarefas
+    const targetCol = taskStore.columns.find((c) => c.title === props.column.title)
+    if (targetCol) {
+      targetCol.tasks = newList
+    }
+  }
+})
+
+// Estados do formulário
 const newTaskTitle = ref('')
 const newTaskDescription = ref('')
-newTaskPriority.value = 'medium'
+const newTaskPriority = ref<'low' | 'medium' | 'high'>('medium')
 const isAdding = ref(false)
+
+// Bloqueia o drag se houver filtros ativos para evitar corrupção de dados
+const isDraggable = computed(() => {
+  return taskStore.searchQuery === '' && taskStore.filterPriority === 'all'
+})
 
 const addTask = () => {
   if (!newTaskTitle.value.trim()) return
@@ -31,6 +48,7 @@ const addTask = () => {
 
   newTaskTitle.value = ''
   newTaskDescription.value = ''
+  newTaskPriority.value = 'medium'
   isAdding.value = false
 }
 </script>
@@ -45,11 +63,12 @@ const addTask = () => {
     </div>
 
     <draggable
-      v-model="column.tasks"
+      v-model="tasks"
       group="tasks"
       item-key="id"
       class="task-list"
       ghost-class="ghost-card"
+      :disabled="!isDraggable"
     >
       <template #item="{ element }">
         <Card :task="element" />
@@ -57,7 +76,11 @@ const addTask = () => {
 
       <template #footer>
         <div v-if="column.tasks.length === 0 && !isAdding" class="empty-state">
-          Arrasta algo para aqui ou cria uma tarefa.
+          {{
+            isDraggable
+              ? 'Arrasta algo para aqui ou cria uma tarefa.'
+              : 'Nenhum resultado para os filtros atuais.'
+          }}
         </div>
       </template>
     </draggable>
@@ -79,10 +102,10 @@ const addTask = () => {
           rows="2"
         ></textarea>
 
-        <select v-model="newTaskPriority" class="input select-priority">
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
+        <select v-model="newTaskPriority" class="select-priority">
+          <option value="low">Baixa</option>
+          <option value="medium">Média</option>
+          <option value="high">Alta</option>
         </select>
 
         <div class="form-buttons">
@@ -98,7 +121,7 @@ const addTask = () => {
 <style scoped>
 .column {
   flex: 1;
-  min-width: 0;
+  min-width: 300px;
   background-color: rgba(30, 41, 59, 0.5);
   border: 1px solid #1e293b;
   border-radius: 12px;
@@ -118,9 +141,10 @@ const addTask = () => {
 
 .column-title {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   color: #94a3b8;
   margin: 0;
+  text-transform: uppercase;
 }
 
 .badge {
@@ -137,6 +161,7 @@ const addTask = () => {
   flex-direction: column;
   gap: 12px;
   min-height: 100px;
+  flex: 1;
 }
 
 .empty-state {
@@ -155,18 +180,28 @@ const addTask = () => {
 
 .btn-show-add {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   background: transparent;
-  border: none;
+  border: 1px dashed #334155;
   color: #94a3b8;
+  border-radius: 8px;
   cursor: pointer;
+  transition: 0.2s;
   text-align: left;
-  border-radius: 6px;
 }
 
 .btn-show-add:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.add-form {
   background: #1e293b;
-  color: #f8fafc;
+  padding: 12px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
 }
 
 .task-input {
@@ -194,21 +229,30 @@ const addTask = () => {
   outline: none;
 }
 
-.task-textarea:focus {
-  border-color: #3b82f6;
+.select-priority {
+  width: 100%;
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  padding: 8px;
+  color: #94a3b8;
+  font-size: 13px;
+  margin-bottom: 12px;
+  outline: none;
 }
 
 .form-buttons {
   display: flex;
   gap: 8px;
+  justify-content: flex-end;
 }
 
 .btn-confirm {
   background: #3b82f6;
   color: white;
   border: none;
-  padding: 4px 12px;
-  border-radius: 4px;
+  padding: 6px 16px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
   font-weight: 600;
@@ -223,30 +267,7 @@ const addTask = () => {
 }
 
 .ghost-card {
-  opacity: 0.5;
-  background: #3b82f6;
-  border-radius: 8px;
-}
-
-.select-priority {
-  width: 100%;
-  background: #0f172a;
-  border: 1px solid #1e293b;
-  border-radius: 6px;
-  padding: 8px;
-  color: #94a3b8;
-  font-size: 13px;
-  margin-bottom: 8px;
-  outline: none;
-  cursor: pointer;
-}
-
-.select-priority:focus {
-  border-color: #3b82f6;
-}
-
-.select-priority option {
-  background-color: #0f172a;
-  color: white;
+  opacity: 0.4;
+  background: #3b82f6 !important;
 }
 </style>
