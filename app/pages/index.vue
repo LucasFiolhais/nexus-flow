@@ -6,7 +6,9 @@ const taskStore = useTaskStore()
 
 <template>
   <div class="page-wrapper">
-    <BoardFilters />
+    <div class="filters-section">
+      <BoardFilters />
+    </div>
 
     <div class="board">
       <Column v-for="column in taskStore.filteredColumns" :key="column.title" :column="column" />
@@ -16,18 +18,26 @@ const taskStore = useTaskStore()
 
 <style scoped>
 .page-wrapper {
-  padding: 24px;
   width: 100%;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  align-items: center;
+  gap: 32px;
+}
+
+.filters-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .board {
   display: flex;
-  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
   width: 100%;
   align-items: flex-start;
+  padding-bottom: 50px;
 }
 </style>
