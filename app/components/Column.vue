@@ -20,7 +20,6 @@ const tasks = computed({
   }
 })
 
-// Estados do formulário
 const newTaskTitle = ref('')
 const newTaskDescription = ref('')
 const newTaskPriority = ref<'low' | 'medium' | 'high'>('medium')
