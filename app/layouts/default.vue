@@ -87,6 +87,7 @@
   background: linear-gradient(90deg, #60a5fa 0%, #2563eb 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
   filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.3));
 }
 
