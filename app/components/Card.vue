@@ -20,8 +20,8 @@ const currentColumn = computed(() => {
 })
 
 const deadlineStatus = computed(() => {
-  if (currentColumn.value === 'Done' || !props.task.dueDate) return null
-
+  if (currentColumn.value?.toUpperCase() === 'DONE') return 'is-done'
+  if (!props.task.dueDate) return null
   const today = new Date().setHours(0, 0, 0, 0)
   const due = new Date(props.task.dueDate).setHours(0, 0, 0, 0)
   const diffInDays = (due - today) / (1000 * 60 * 60 * 24)
@@ -31,7 +31,9 @@ const deadlineStatus = computed(() => {
   return null
 })
 
-const isOverdue = computed(() => deadlineStatus.value === 'is-overdue')
+const isOverdue = computed(() => {
+  return currentColumn.value?.toUpperCase() !== 'DONE' && deadlineStatus.value === 'is-overdue'
+})
 </script>
 
 <template>
@@ -89,7 +91,14 @@ const isOverdue = computed(() => deadlineStatus.value === 'is-overdue')
   border: 1px solid #f97316;
   box-shadow: 0 0 10px rgba(249, 115, 22, 0.1);
 }
-
+.card.is-done {
+  border: 1px solid #10b981;
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.1);
+}
+.card.card.is-done .desc {
+  color: #64748b;
+  opacity: 0.5;
+}
 .card:hover {
   border-color: #3b82f6;
   transform: translateY(-2px);
