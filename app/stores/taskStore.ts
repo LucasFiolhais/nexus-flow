@@ -9,6 +9,7 @@ export const useTaskStore = defineStore('taskStore', {
       { title: 'Done', tasks: [] }
     ] as Column[],
 
+    selectedTask: null as Task | null,
     searchQuery: '',
     filterPriority: 'all' as 'all' | 'low' | 'medium' | 'high'
   }),
@@ -16,7 +17,6 @@ export const useTaskStore = defineStore('taskStore', {
   getters: {
     filteredColumns: (state) => {
       const query = state.searchQuery.toLowerCase().trim()
-
       return state.columns.map((column) => ({
         ...column,
         tasks: column.tasks.filter((task) => {
@@ -30,22 +30,38 @@ export const useTaskStore = defineStore('taskStore', {
   },
 
   actions: {
+    selectTask(task: Task | null) {
+      this.selectedTask = task
+    },
+
     addTaskToColumn(columnTitle: string, task: Task) {
-      const column = this.columns.find((col) => col.title === columnTitle)
+      const column = this.columns.find(
+        (col) => col.title.toUpperCase() === columnTitle.toUpperCase()
+      )
       if (column) {
+        if (!task.subtasks) task.subtasks = []
         column.tasks.push(task)
       }
+    },
+
+    updateTask(updatedTask: Task) {
+      this.columns.forEach((col) => {
+        const index = col.tasks.findIndex((t) => t.id === updatedTask.id)
+        if (index !== -1) {
+          col.tasks[index] = { ...updatedTask }
+        }
+      })
     },
 
     removeTask(taskId: number) {
       this.columns.forEach((column) => {
         column.tasks = column.tasks.filter((task) => task.id !== taskId)
       })
+      if (this.selectedTask?.id === taskId) this.selectedTask = null
     },
 
     moveTask(taskId: number, newColumnTitle: string) {
       let taskToMove: Task | null = null
-
       this.columns.forEach((col) => {
         const index = col.tasks.findIndex((t) => t.id === taskId)
         if (index !== -1) {
@@ -54,13 +70,14 @@ export const useTaskStore = defineStore('taskStore', {
       })
 
       if (taskToMove) {
-        const targetCol = this.columns.find((col) => col.title === newColumnTitle)
+        const targetCol = this.columns.find(
+          (col) => col.title.toUpperCase() === newColumnTitle.toUpperCase()
+        )
         if (targetCol) {
           targetCol.tasks.push(taskToMove)
         }
       }
     }
   },
-
   persist: true
 })

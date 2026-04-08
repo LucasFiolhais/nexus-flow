@@ -13,6 +13,8 @@ const taskStore = useTaskStore()
     <div class="board">
       <Column v-for="column in taskStore.filteredColumns" :key="column.title" :column="column" />
     </div>
+
+    <Modal />
   </div>
 </template>
 
