@@ -23,6 +23,7 @@ const tasks = computed({
 const newTaskTitle = ref('')
 const newTaskDescription = ref('')
 const newTaskPriority = ref<'low' | 'medium' | 'high'>('medium')
+const newTaskDueDate = ref('')
 const isAdding = ref(false)
 
 const isDraggable = computed(() => {
@@ -37,7 +38,11 @@ const addTask = () => {
     title: newTaskTitle.value,
     description: newTaskDescription.value.trim() || 'Sem descrição',
     priority: newTaskPriority.value,
-    createdAt: new Date().toISOString() as any
+    createdAt: new Date().toISOString()
+  }
+
+  if (newTaskDueDate.value) {
+    newTask.dueDate = newTaskDueDate.value
   }
 
   taskStore.addTaskToColumn(props.column.title, newTask)
@@ -45,6 +50,7 @@ const addTask = () => {
   newTaskTitle.value = ''
   newTaskDescription.value = ''
   newTaskPriority.value = 'medium'
+  newTaskDueDate.value = ''
   isAdding.value = false
 }
 </script>
@@ -72,11 +78,7 @@ const addTask = () => {
 
       <template #footer>
         <div v-if="column.tasks.length === 0 && !isAdding" class="empty-state">
-          {{
-            isDraggable
-              ? 'Arrasta algo para aqui ou cria uma tarefa.'
-              : 'Nenhum resultado para os filtros atuais.'
-          }}
+          {{ isDraggable ? 'Arrasta algo para aqui ou cria uma tarefa.' : 'Nenhum resultado.' }}
         </div>
       </template>
     </draggable>
@@ -85,18 +87,20 @@ const addTask = () => {
       <div v-if="isAdding" class="add-form">
         <input
           v-model="newTaskTitle"
-          placeholder="Título da tarefa..."
+          placeholder="Título..."
           class="task-input"
           @keyup.enter="addTask"
           auto-focus
         />
-
         <textarea
           v-model="newTaskDescription"
-          placeholder="Adicionar descrição..."
+          placeholder="Descrição..."
           class="task-textarea"
           rows="2"
         ></textarea>
+
+        <label class="input-label">Data Limite (Opcional)</label>
+        <input v-model="newTaskDueDate" type="date" class="task-date-input" />
 
         <select v-model="newTaskPriority" class="select-priority">
           <option value="low">Baixa</option>
@@ -116,8 +120,9 @@ const addTask = () => {
 
 <style scoped>
 .column {
-  flex: 1;
+  flex: 1 1 300px;
   min-width: 300px;
+  max-width: 450px;
   background-color: rgba(30, 41, 59, 0.5);
   border: 1px solid #1e293b;
   border-radius: 12px;
@@ -128,21 +133,17 @@ const addTask = () => {
 .column-header {
   padding: 16px;
 }
-
 .title-group {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-
 .column-title {
   font-size: 14px;
   font-weight: 700;
   color: #94a3b8;
-  margin: 0;
   text-transform: uppercase;
 }
-
 .badge {
   font-size: 11px;
   background-color: #1e293b;
@@ -150,7 +151,6 @@ const addTask = () => {
   border-radius: 4px;
   color: #64748b;
 }
-
 .task-list {
   padding: 12px;
   display: flex;
@@ -159,7 +159,6 @@ const addTask = () => {
   min-height: 100px;
   flex: 1;
 }
-
 .empty-state {
   padding: 20px;
   text-align: center;
@@ -169,11 +168,9 @@ const addTask = () => {
   border-radius: 8px;
   margin: 10px;
 }
-
 .footer-actions {
   padding: 12px;
 }
-
 .btn-show-add {
   width: 100%;
   padding: 10px;
@@ -182,67 +179,43 @@ const addTask = () => {
   color: #94a3b8;
   border-radius: 8px;
   cursor: pointer;
-  transition: 0.2s;
   text-align: left;
 }
-
-.btn-show-add:hover {
-  background: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
-  border-color: #3b82f6;
-}
-
 .add-form {
   background: #1e293b;
   padding: 12px;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
+  gap: 8px;
 }
-
-.task-input {
+.task-input,
+.task-textarea,
+.task-date-input,
+.select-priority {
   width: 100%;
   background: #0f172a;
-  border: 1px solid #3b82f6;
+  border: 1px solid #334155;
   border-radius: 6px;
   padding: 8px;
   color: white;
   font-size: 14px;
-  margin-bottom: 8px;
   outline: none;
 }
-
-.task-textarea {
-  width: 100%;
-  background: #0f172a;
-  border: 1px solid #1e293b;
-  border-radius: 6px;
-  padding: 8px;
-  color: #94a3b8;
-  font-size: 13px;
-  margin-bottom: 8px;
-  resize: none;
-  outline: none;
+.task-date-input {
+  color-scheme: dark;
 }
-
-.select-priority {
-  width: 100%;
-  background: #0f172a;
-  border: 1px solid #1e293b;
-  border-radius: 6px;
-  padding: 8px;
-  color: #94a3b8;
-  font-size: 13px;
-  margin-bottom: 12px;
-  outline: none;
+.input-label {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
 }
-
 .form-buttons {
   display: flex;
   gap: 8px;
   justify-content: flex-end;
 }
-
 .btn-confirm {
   background: #3b82f6;
   color: white;
@@ -253,7 +226,6 @@ const addTask = () => {
   font-size: 12px;
   font-weight: 600;
 }
-
 .btn-cancel {
   background: transparent;
   color: #94a3b8;
@@ -261,7 +233,6 @@ const addTask = () => {
   cursor: pointer;
   font-size: 12px;
 }
-
 .ghost-card {
   opacity: 0.4;
   background: #3b82f6 !important;
