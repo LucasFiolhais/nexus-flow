@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Task } from '~/types/kanban'
+import { useTaskStore } from '~/stores/taskStore'
 
 const taskStore = useTaskStore()
 const props = defineProps<{ task: Task }>()
 const { formatDate } = useFormatter()
+
+const openTaskModal = () => {
+  taskStore.selectTask(props.task)
+}
 
 const deleteTask = () => {
   taskStore.removeTask(props.task.id)
@@ -37,7 +42,7 @@ const isOverdue = computed(() => {
 </script>
 
 <template>
-  <div :class="['card', deadlineStatus]">
+  <div :class="['card', deadlineStatus]" @click="openTaskModal">
     <button class="btn-delete" @click.stop="deleteTask" title="Eliminar">&times;</button>
 
     <h3 class="title">{{ task.title }}</h3>
@@ -58,7 +63,7 @@ const isOverdue = computed(() => {
       </div>
       <div class="footer-right">
         <span class="id">#{{ task.id }}</span>
-        <select :value="currentColumn" @change="changeColumn" class="select-status">
+        <select :value="currentColumn" @change="changeColumn" @click.stop class="select-status">
           <option value="To do">TO DO</option>
           <option value="In Progress">IN PROGRESS</option>
           <option value="Done">DONE</option>
@@ -77,7 +82,7 @@ const isOverdue = computed(() => {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  cursor: grab;
+  cursor: pointer;
   transition: 0.2s;
   position: relative;
 }
@@ -91,17 +96,22 @@ const isOverdue = computed(() => {
   border: 1px solid #f97316;
   box-shadow: 0 0 10px rgba(249, 115, 22, 0.1);
 }
+
 .card.is-done {
   border: 1px solid #10b981;
-  box-shadow: 0 0 10px rgba(249, 115, 22, 0.1);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.1);
 }
-.card.card.is-done .desc {
+
+.card.is-done .desc,
+.card.is-done .title {
   color: #64748b;
   opacity: 0.5;
+  text-decoration: line-through;
 }
+
 .card:hover {
-  border-color: #3b82f6;
   transform: translateY(-2px);
+  background: #232f42;
 }
 
 .deadline {
@@ -134,7 +144,7 @@ const isOverdue = computed(() => {
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
-  transition: 0.2s;
+  z-index: 10;
 }
 
 .btn-delete:hover {
@@ -156,6 +166,11 @@ const isOverdue = computed(() => {
   margin: 0;
   overflow-wrap: break-word;
   white-space: pre-wrap;
+  display: -webkit-box;
+  line-clamp: 1;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .footer {
@@ -200,11 +215,6 @@ const isOverdue = computed(() => {
   width: fit-content;
   text-transform: uppercase;
   font-weight: 600;
-}
-
-.select-status:hover {
-  border-color: #3b82f6;
-  color: #f8fafc;
 }
 
 .badge {

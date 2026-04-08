@@ -38,7 +38,8 @@ const addTask = () => {
     title: newTaskTitle.value,
     description: newTaskDescription.value.trim() || 'Sem descrição',
     priority: newTaskPriority.value,
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
+    subtasks: []
   }
 
   if (newTaskDueDate.value) {
