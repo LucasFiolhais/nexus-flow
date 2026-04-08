@@ -20,7 +20,7 @@ const currentColumn = computed(() => {
 })
 
 const deadlineStatus = computed(() => {
-  if (!props.task.dueDate) return null
+  if (currentColumn.value === 'Done' || !props.task.dueDate) return null
 
   const today = new Date().setHours(0, 0, 0, 0)
   const due = new Date(props.task.dueDate).setHours(0, 0, 0, 0)
