@@ -26,6 +26,26 @@ export const useTaskStore = defineStore('taskStore', {
           return matchesSearch && matchesPriority
         })
       }))
+    },
+
+    stats: (state) => {
+      const allTasks = state.columns.flatMap((col) => col.tasks)
+
+      const total = allTasks.length
+
+      const completed =
+        state.columns.find((col) => col.title.toUpperCase() === 'DONE')?.tasks.length || 0
+
+      const pending = total - completed
+
+      const percentage = total > 0 ? Math.round((completed / total) * 100) : 0
+
+      return {
+        total,
+        completed,
+        pending,
+        percentage
+      }
     }
   },
 
@@ -51,6 +71,10 @@ export const useTaskStore = defineStore('taskStore', {
           col.tasks[index] = { ...updatedTask }
         }
       })
+
+      if (this.selectedTask?.id === updatedTask.id) {
+        this.selectedTask = { ...updatedTask }
+      }
     },
 
     removeTask(taskId: number) {
