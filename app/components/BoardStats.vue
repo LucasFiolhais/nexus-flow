@@ -6,14 +6,16 @@ const taskStore = useTaskStore()
 <template>
   <div class="stats-container">
     <div class="stat-card">
-      <span class="stat-value">{{ taskStore.stats.pending }}</span>
+      <span class="stat-value text-blue">{{ taskStore.stats.pending }}</span>
       <span class="stat-label">Tarefas Pendentes</span>
     </div>
 
     <div class="stat-card progress-card">
       <div class="progress-info">
-        <span class="percentage">{{ taskStore.stats.percentage }}%</span>
-        <span class="stat-label">Trabalho Concluído</span>
+        <div class="percentage-group">
+          <span class="percentage">{{ taskStore.stats.percentage }}%</span>
+          <span class="stat-label">Trabalho Concluído</span>
+        </div>
       </div>
       <div class="progress-bar-bg">
         <div class="progress-bar-fill" :style="{ width: taskStore.stats.percentage + '%' }"></div>
@@ -25,64 +27,97 @@ const taskStore = useTaskStore()
 <style scoped>
 .stats-container {
   display: flex;
-  gap: 20px;
+  gap: 16px;
   width: 100%;
-  max-width: 1200px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .stat-card {
+  flex: 1;
   background: #1e293b;
   padding: 20px;
-  border-radius: 12px;
+  border-radius: 16px;
   border: 1px solid #334155;
-  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .stat-value {
-  font-size: 28px;
-  font-weight: 800;
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.text-blue {
   color: #3b82f6;
 }
 
 .percentage {
-  font-size: 28px;
-  font-weight: 800;
+  font-size: 32px;
+  font-weight: 900;
   color: #10b981;
+  line-height: 1;
 }
 
 .stat-label {
-  font-size: 12px;
+  font-size: 11px;
   color: #94a3b8;
   text-transform: uppercase;
+  letter-spacing: 1px;
   font-weight: 700;
-  letter-spacing: 0.5px;
 }
 
 .progress-card {
-  flex: 2;
+  flex: 1.5;
 }
 
 .progress-info {
+  margin-bottom: 12px;
+}
+
+.percentage-group {
   display: flex;
-  justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 10px;
+  gap: 10px;
 }
 
 .progress-bar-bg {
-  height: 8px;
+  height: 10px;
   background: #0f172a;
-  border-radius: 10px;
+  border-radius: 20px;
   overflow: hidden;
 }
 
 .progress-bar-fill {
   height: 100%;
   background: linear-gradient(90deg, #10b981, #34d399);
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.8s ease-out;
+}
+
+@media (max-width: 768px) {
+  .stats-container {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .stat-card {
+    flex: none;
+    width: 100%;
+    padding: 16px;
+    min-height: auto;
+  }
+
+  .percentage-group {
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  .stat-value,
+  .percentage {
+    font-size: 28px;
+  }
 }
 </style>
