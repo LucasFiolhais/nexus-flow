@@ -76,14 +76,12 @@ const addTask = () => {
       :disabled="!isDraggable"
       :delay="200"
       :touch-start-threshold="5"
+      filter=".task-input, .select-priority, .btn-confirm, .btn-cancel"
+      :prevent-on-filter="false"
     >
       <template #item="{ element }">
-        <Card :task="element" />
-      </template>
-
-      <template #footer>
-        <div v-if="column.tasks.length === 0 && !isAdding" class="empty-state">
-          {{ isDraggable ? 'Arrasta algo para aqui ou cria uma tarefa.' : 'Nenhum resultado.' }}
+        <div @click="taskStore.selectTask(element)">
+          <Card :task="element" />
         </div>
       </template>
     </draggable>

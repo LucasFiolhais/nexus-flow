@@ -49,21 +49,30 @@ const isOverdue = computed(() => {
     <p class="desc">{{ task.description }}</p>
 
     <div v-if="task.dueDate" :class="['deadline', { overdue: isOverdue }]">
-      <span class="icon">Data Limite:</span>
-      {{ formatDate(task.dueDate) }}
+      <span class="deadline-label">Data Limite:</span>
+      <span class="deadline-text">{{ formatDate(task.dueDate) }}</span>
       <span v-if="isOverdue" class="alert-text">(Atrasada)</span>
     </div>
 
     <footer class="footer">
-      <div class="meta">
+      <div class="footer-top">
         <span class="date">Criado em: {{ formatDate(task.createdAt) }}</span>
         <span :class="['badge', task.priority]">
           {{ task.priority }}
         </span>
       </div>
-      <div class="footer-right">
+
+      <div class="footer-bottom">
         <span class="id">#{{ task.id }}</span>
-        <select :value="currentColumn" @change="changeColumn" @click.stop class="select-status">
+
+        <select
+          :value="currentColumn"
+          @change="changeColumn"
+          @click.stop
+          @touchstart.stop
+          @mousedown.stop
+          class="select-status"
+        >
           <option value="To do">TO DO</option>
           <option value="In Progress">IN PROGRESS</option>
           <option value="Done">DONE</option>
@@ -77,144 +86,143 @@ const isOverdue = computed(() => {
 .card {
   background: #1e293b;
   padding: 16px;
-  border-radius: 8px;
+  border-radius: 12px;
   border: 1px solid #334155;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   cursor: pointer;
-  transition: 0.2s;
+  transition:
+    transform 0.2s,
+    background 0.2s;
   position: relative;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .card.is-overdue {
   border: 1px solid #ef4444;
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.1);
 }
-
 .card.is-near-due {
   border: 1px solid #f97316;
-  box-shadow: 0 0 10px rgba(249, 115, 22, 0.1);
 }
-
 .card.is-done {
   border: 1px solid #10b981;
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.1);
+  opacity: 0.8;
 }
 
 .card.is-done .desc,
 .card.is-done .title {
   color: #64748b;
-  opacity: 0.5;
   text-decoration: line-through;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  background: #232f42;
 }
 
 .deadline {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 6px;
   font-size: 11px;
-  font-weight: 600;
-  color: #94a3b8;
-  background: rgba(15, 23, 42, 0.4);
-  padding: 4px 8px;
-  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.6);
+  padding: 6px 10px;
+  border-radius: 8px;
   width: fit-content;
+  max-width: 100%;
 }
 
-.overdue {
+.deadline-label {
+  font-weight: 800;
+  color: #60a5fa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.deadline-text {
+  font-weight: 600;
+  color: #f8fafc;
+  white-space: nowrap;
+}
+
+.overdue .deadline-label,
+.overdue .deadline-text {
   color: #f87171;
-  background: rgba(239, 68, 68, 0.1);
+}
+
+.alert-text {
+  font-weight: 700;
+  color: #f87171;
 }
 
 .btn-delete {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  background: transparent;
+  top: 10px;
+  right: 10px;
+  background: #334155;
   border: none;
-  color: #475569;
-  font-size: 20px;
-  line-height: 1;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  z-index: 10;
-}
-
-.btn-delete:hover {
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.1);
+  color: #94a3b8;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  z-index: 20;
 }
 
 .title {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   color: #f8fafc;
   margin: 0;
-  padding-right: 20px;
+  padding-right: 25px;
 }
 
 .desc {
   font-size: 13px;
   color: #94a3b8;
   margin: 0;
+  white-space: pre-line;
   overflow-wrap: break-word;
-  white-space: pre-wrap;
   display: -webkit-box;
-  line-clamp: 1;
-  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
+  max-height: 3.2em;
+  line-height: 1.6;
 }
 
 .footer {
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+  border-top: 1px solid #334155;
+  padding-top: 12px;
+}
+
+.footer-top {
+  display: flex;
   justify-content: space-between;
-  align-items: flex-end;
-  margin-top: 8px;
+  align-items: center;
 }
 
-.footer-right {
+.footer-bottom {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.meta {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.date {
-  font-size: 10px;
-  color: #64748b;
-}
-
-.id {
-  font-size: 9px;
-  color: #475569;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .select-status {
   background: #0f172a;
-  border: 1px solid #334155;
-  color: #64748b;
+  border: 1px solid #475569;
+  color: #f8fafc;
   font-size: 10px;
-  padding: 2px 6px;
-  border-radius: 4px;
-  margin-top: 6px;
-  cursor: pointer;
-  outline: none;
-  width: fit-content;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 700;
   text-transform: uppercase;
-  font-weight: 600;
+  min-height: 28px;
 }
 
 .badge {
@@ -224,7 +232,6 @@ const isOverdue = computed(() => {
   text-transform: uppercase;
   font-weight: 800;
   color: white;
-  width: fit-content;
 }
 
 .low {
@@ -235,5 +242,14 @@ const isOverdue = computed(() => {
 }
 .high {
   background-color: #ef4444;
+}
+
+.date {
+  font-size: 10px;
+  color: #64748b;
+}
+.id {
+  font-size: 9px;
+  color: #475569;
 }
 </style>
