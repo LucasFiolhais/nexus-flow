@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import draggable from 'vuedraggable'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import type { Task, Column } from '~/types/kanban'
 import { useTaskStore } from '~/stores/taskStore'
 
@@ -9,6 +9,11 @@ const props = defineProps<{
 }>()
 
 const taskStore = useTaskStore()
+
+const isMobile = ref(false)
+onMounted(() => {
+  isMobile.value = window.matchMedia('(max-width: 768px)').matches
+})
 
 const tasks = computed({
   get: () => props.column.tasks,
@@ -74,13 +79,13 @@ const addTask = () => {
       class="task-list"
       ghost-class="ghost-card"
       :disabled="!isDraggable"
-      :delay="200"
-      :touch-start-threshold="5"
-      filter=".task-input, .select-priority, .btn-confirm, .btn-cancel"
+      :delay="isMobile ? 200 : 0"
+      :touch-start-threshold="isMobile ? 5 : 0"
+      filter=".task-input, .select-priority, .btn-confirm, .btn-cancel, .select-status, .btn-delete"
       :prevent-on-filter="false"
     >
       <template #item="{ element }">
-        <div @click="taskStore.selectTask(element)">
+        <div class="card-wrapper" @click="taskStore.selectTask(element)">
           <Card :task="element" />
         </div>
       </template>
@@ -138,11 +143,12 @@ const addTask = () => {
   transition: all 0.3s ease;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .column {
     min-width: 100%;
     max-width: 100%;
     max-height: none;
+    margin-bottom: 20px;
   }
 }
 
@@ -179,19 +185,24 @@ const addTask = () => {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-height: 100px;
+  min-height: 150px;
   flex: 1;
   overflow-y: auto;
 }
 
-.empty-state {
-  padding: 30px 20px;
-  text-align: center;
-  font-size: 12px;
-  color: #475569;
-  border: 2px dashed #1e293b;
+.ghost-card {
+  opacity: 0.4;
+  background: #1e293b !important;
+  border: 2px dashed #3b82f6 !important;
   border-radius: 12px;
-  margin: 10px;
+}
+
+.card-wrapper {
+  cursor: grab;
+}
+
+.card-wrapper:active {
+  cursor: grabbing;
 }
 
 .footer-actions {
@@ -239,7 +250,6 @@ const addTask = () => {
   color: #f8fafc;
   font-size: 14px;
   outline: none;
-  transition: border-color 0.2s;
 }
 
 .task-input:focus,
@@ -280,12 +290,6 @@ const addTask = () => {
   cursor: pointer;
   font-size: 12px;
   font-weight: 600;
-}
-
-.ghost-card {
-  opacity: 0.2;
-  background: #3b82f6 !important;
-  border: 2px solid #3b82f6;
 }
 
 .task-list::-webkit-scrollbar {
