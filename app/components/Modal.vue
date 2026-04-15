@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import { useTaskStore } from '~/stores/taskStore'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const taskStore = useTaskStore()
 const newSubtaskTitle = ref('')
 
 const closeModal = () => taskStore.selectTask(null)
+
+const subtaskProgress = computed(() => {
+  const subtasks = taskStore.selectedTask?.subtasks || []
+  if (subtasks.length === 0) return 0
+
+  const completed = subtasks.filter((s) => s.isDone).length
+  return Math.round((completed / subtasks.length) * 100)
+})
 
 const addSubtask = () => {
   if (!newSubtaskTitle.value.trim() || !taskStore.selectedTask) return
@@ -55,7 +63,17 @@ const deleteSubtask = (id: number) => {
         </div>
 
         <div class="section">
-          <label>Sub-tarefas</label>
+          <div class="subtask-header">
+            <label>Sub-tarefas</label>
+            <span v-if="taskStore.selectedTask.subtasks.length > 0" class="progress-badge">
+              {{ subtaskProgress }}%
+            </span>
+          </div>
+
+          <div v-if="taskStore.selectedTask.subtasks.length > 0" class="subtask-progress-bar">
+            <div class="progress-fill" :style="{ width: subtaskProgress + '%' }"></div>
+          </div>
+
           <div class="subtask-list">
             <div v-for="sub in taskStore.selectedTask.subtasks" :key="sub.id" class="subtask-item">
               <input type="checkbox" v-model="sub.isDone" @change="toggleSubtask" />
@@ -138,6 +156,36 @@ const deleteSubtask = (id: number) => {
   gap: 10px;
 }
 
+.subtask-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.progress-badge {
+  font-size: 10px;
+  font-weight: 900;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.subtask-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #0f172a;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #10b981);
+  transition: width 0.4s ease-out;
+}
+
 label {
   font-size: 11px;
   color: #60a5fa;
@@ -176,6 +224,11 @@ textarea {
   width: 18px;
   height: 18px;
   accent-color: #3b82f6;
+}
+
+.is-done {
+  text-decoration: line-through;
+  color: #64748b;
 }
 
 .add-subtask-group {
